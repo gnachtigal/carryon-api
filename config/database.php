@@ -52,6 +52,8 @@ return [
             'prefix' => '',
             'strict' => true,
             'engine' => null,
+            'wait_timeout' => 28800,
+            'interactive_timeout' => 28800,
         ],
 
         'pgsql' => [
