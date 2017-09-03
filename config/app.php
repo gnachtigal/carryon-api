@@ -180,6 +180,12 @@ return [
         //Passport
         Laravel\Passport\PassportServiceProvider::class,
 
+        //Google Cloud Storage
+        // Superbalist\LaravelGoogleCloudStorage\GoogleCloudStorageServiceProvider::class,
+
+        // Remote SSH server
+        Collective\Remote\RemoteServiceProvider::class,
+
     ],
 
     /*
@@ -228,6 +234,7 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
+        'SSH' => Collective\Remote\RemoteFacade::class,
 
     ],
 
