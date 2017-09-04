@@ -37,7 +37,7 @@ class UserController extends Controller
        $user = User::create($input);
        $success['name'] =  $user->name;
 
-       return response()->json(['success'=>$success], $this->successStatus);
+       return response()->json(['success'=>$success, 'name' => $user->name, 'id' => $user->id, 'email' => $user->email, 'msg' => 'Você está conectado!'], $this->successStatus);
    }
 
 }
