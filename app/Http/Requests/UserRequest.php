@@ -36,7 +36,7 @@ class UserRequest extends FormRequest
            'name.required' => 'O campo nome é obrigatório.',
            'email.required'  => 'O campo e-mail é obrigatório.',
            'password.required'  => 'O campo senha é obrigatório.',
-           'c_password.same'  => 'O campo e-mail é obrigatório.',
+           'c_password.same'  => 'As senhas devem coincidir.',
    ];
     }
 }
