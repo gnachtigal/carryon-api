@@ -26,7 +26,7 @@ class UserController extends Controller
    public function register(UserRequest $request)
    {
 
-       $validator = Validator::make($data, $rules);
+       $validator = Validator::make($request->all(), $this->rules());
 
        if ($validator->fails()) {
            return response()->json(['error'=>$validator->errors()], 401);
