@@ -20,3 +20,11 @@ Vue.component('example', require('./components/Example.vue'));
 const app = new Vue({
     el: '#app'
 });
+
+Echo.private('chat')
+  .listen('MessageSent', (e) => {
+    this.messages.push({
+      message: e.message.message,
+      user: e.user
+    });
+  });
