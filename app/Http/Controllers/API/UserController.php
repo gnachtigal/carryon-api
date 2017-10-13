@@ -13,10 +13,10 @@ class UserController extends Controller
 {
     public $successStatus = 200;
 
-    public function login(){
-       if(Auth::attempt(['email' => request('email'), 'password' => request('password')])){
+    public function login(Request $request){
+       if(Auth::attempt(['email' => $request['email'], 'password' => $request['password']])){
            $user = Auth::user();
-           return response()->json(['name' => $user->name, 'id' => $user->id, 'email' => $user->email, 'msg' => 'Você está conectado!'], $this->successStatus);
+           return response()->json(['success' => true, 'name' => $user->name, 'id' => $user->id, 'email' => $user->email, 'msg' => 'Você está conectado!'], $this->successStatus);
        }
        else{
            return response()->json(['msg'=>'Usuário ou senha inválidos!']);
@@ -25,19 +25,18 @@ class UserController extends Controller
 
    public function register(UserRequest $request)
    {
+        if($request){
+            $input = $request->all();
+            $input['password'] = bcrypt($input['password']);
+            $user = User::create($input);
 
-       $validator = Validator::make($request->all(), $request->rules());
+            return response()->json(['success'=>true, 'name' => $user->name, 'id' => $user->id, 'email' => $user->email, 'msg' => 'Você está conectado!'], $this->successStatus);
+        }else{
+            if ($validator->fails()) {
+              return response()->json(['success' => false, 'error'=>$validator->errors()], 401);
+            }
+        }
 
-       if ($validator->fails()) {
-           return response()->json(['error'=>$validator->errors()], 401);
-       }
-
-       $input = $request->all();
-       $input['password'] = bcrypt($input['password']);
-       $user = User::create($input);
-       $success['name'] =  $user->name;
-
-       return response()->json(['success'=>$success, 'name' => $user->name, 'id' => $user->id, 'email' => $user->email, 'msg' => 'Você está conectado!'], $this->successStatus);
    }
 
 }

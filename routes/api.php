@@ -19,6 +19,6 @@ Route::post('register', 'API\UserController@register');
 
 
 
-// Route::group(['middleware' => 'auth:api'], function(){
-// 	Route::post('details', 'API\UserController@details');
-// });
+Route::group(['prefix' => 'chat'], function(){
+	Route::get('', 'API\ChatController@index');
+});

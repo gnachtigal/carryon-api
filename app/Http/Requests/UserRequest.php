@@ -35,6 +35,7 @@ class UserRequest extends FormRequest
         return [
            'name.required' => 'O campo nome é obrigatório.',
            'email.required'  => 'O campo e-mail é obrigatório.',
+           'email.email'  => 'Insira um e-mail válido.',
            'password.required'  => 'O campo senha é obrigatório.',
            'c_password.same'  => 'As senhas devem coincidir.',
    ];

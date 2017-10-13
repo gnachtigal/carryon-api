@@ -15,9 +15,9 @@ class ChatController extends Controller
     public function index(){
         $user = Auth::user();
 
-        $chats = $user->chats();
+        // $chats = $user->chats()-with('members');
 
-        return ['chats' => $chats];
+        return response()->json(['user' => $user]);
     }
 
     public function show($id){
