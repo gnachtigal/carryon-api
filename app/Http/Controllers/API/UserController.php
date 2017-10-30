@@ -8,35 +8,38 @@ use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use Validator;
+use JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class UserController extends Controller
 {
     public $successStatus = 200;
 
-    public function login(Request $request){
-       if(Auth::attempt(['email' => $request['email'], 'password' => $request['password']])){
-           $user = Auth::user();
-           return response()->json(['success' => true, 'name' => $user->name, 'id' => $user->id, 'email' => $user->email, 'msg' => 'Você está conectado!'], $this->successStatus);
-       }
-       else{
-           return response()->json(['msg'=>'Usuário ou senha inválidos!']);
-       }
-   }
 
-   public function register(UserRequest $request)
+   public function authenticate(Request $request)
    {
-        if($request){
-            $input = $request->all();
-            $input['password'] = bcrypt($input['password']);
-            $user = User::create($input);
+       // grab credentials from the request
+       $credentials = $request->only('email', 'password');
 
-            return response()->json(['success'=>true, 'name' => $user->name, 'id' => $user->id, 'email' => $user->email, 'msg' => 'Você está conectado!'], $this->successStatus);
-        }else{
-            if ($validator->fails()) {
-              return response()->json(['success' => false, 'error'=>$validator->errors()], 401);
-            }
-        }
+       try {
+           // attempt to verify the credentials and create a token for the user
+           if (! $token = JWTAuth::attempt($credentials)) {
+               return response()->json(['error' => 'invalid_credentials'], 401);
+           }
+       } catch (JWTException $e) {
+           // something went wrong whilst attempting to encode the token
+           return response()->json(['error' => 'could_not_create_token'], 500);
+       }
 
+       // all good so return the token
+       return response()->json(compact('token'));
    }
+
+    public function getAuthenticatedUser($id)
+    {
+        $user = User::find($id);
+
+    	return response()->json(compact('user'));
+    }
 
 }

@@ -27,7 +27,7 @@ class UserRequest extends FormRequest
             'name' => 'required',
             'email' => 'required|email',
             'password' => 'required',
-            'c_password' => 'required|same:password',
+            'password_confirmation' => 'required|same:password',
         ];
     }
 
@@ -37,7 +37,7 @@ class UserRequest extends FormRequest
            'email.required'  => 'O campo e-mail é obrigatório.',
            'email.email'  => 'Insira um e-mail válido.',
            'password.required'  => 'O campo senha é obrigatório.',
-           'c_password.same'  => 'As senhas devem coincidir.',
+           'password_confirmation.same'  => 'As senhas devem coincidir.',
    ];
     }
 }

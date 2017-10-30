@@ -18,6 +18,8 @@ class CreateUserChatsTable extends Migration
                 $table->engine = 'InnoDB';
                 $table->integer('user_id');
                 $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+                $table->integer('voluntary_id')->unsigned()->index();
+                $table->foreign('voluntary_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');;
                 $table->integer('chat_id');
                 $table->foreign('chat_id')->references('id')->on('chats')->onDelete('cascade')->onUpdate('cascade');
                 $table->primary(['user_id', 'chat_id']);

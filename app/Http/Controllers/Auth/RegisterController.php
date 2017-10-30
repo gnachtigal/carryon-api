@@ -6,6 +6,9 @@ use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
+use App\Http\Requests\UserRequest;
+use JWTAuth;
 
 class RegisterController extends Controller
 {
@@ -39,6 +42,22 @@ class RegisterController extends Controller
         $this->middleware('guest');
     }
 
+
+    public function register(UserRequest $request) {
+        if($request){
+            $input = $request->all();
+            $user = $this->create($input)->toArray();
+            $credentials = $request->only('email', 'password');
+            $success = true;
+
+            $token = JWTAuth::attempt($credentials);
+
+            return response()->json(compact('token', 'user', 'success'));
+        }else{
+             return response()->json(['success' => false, 'error'=>$validator->errors()], 401);
+        }
+
+    }
     /**
      * Get a validator for an incoming registration request.
      *
@@ -67,6 +86,7 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
+            'remember_token' => str_random(30),
             'voluntary' => $data['voluntary'],
         ]);
     }

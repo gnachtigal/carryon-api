@@ -7,14 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Chat extends Model
 {
     protected $fillable = [
-        'id', 'title'
+        'title'
     ];
 
     public function messages(){
-        return $this->hasMany('App\Message');
-    }
-
-    public function members(){
-        return $this->hasMany('App\User');
+        return $this->hasMany('App\Message', 'chat_id');
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
@@ -35,5 +36,38 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+
+    public function login(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
+
+        if ($token = $this->guard()->attempt($credentials)) {
+            return $this->sendLoginResponse($request, $token);
+        }
+    }
+
+    protected function sendLoginResponse(Request $request, string $token)
+    {
+        $this->clearLoginAttempts($request);
+
+        return $this->authenticated($request, $this->guard()->user(), $token);
+    }
+
+    protected function authenticated(Request $request, $user, string $token)
+    {
+        return response()->json([
+            'token' => $token,
+            'user' => $user,
+            'msg' => 'Você está conectado!',
+            'success' => true,
+        ]);
+    }
+
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        return response()->json([
+            'msg' => 'Usuário ou senha inválidos!',
+        ], 401);
     }
 }

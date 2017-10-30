@@ -2,12 +2,25 @@
 
 namespace App;
 
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 
-class User extends Authenticatable
+use Tymon\JWTAuth\Contracts\JWTSubject as AuthenticatableUserContract;
+
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+
+class User extends Model implements
+    AuthenticatableContract,
+    AuthorizableContract,
+    CanResetPasswordContract,
+    AuthenticatableUserContract
 {
-    use Notifiable;
+    use Authenticatable, Authorizable, CanResetPassword, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -38,6 +51,32 @@ class User extends Authenticatable
     }
 
     public function chats(){
-        return $this->belongsToMany('App\Chat');
+        if($this->voluntary){
+            return $this->belongsToMany('App\Chat', 'user_chats', 'voluntary_id', 'chat_id');
+        }else{
+            return $this->belongsToMany('App\Chat', 'user_chats', 'user_id', 'chat_id');
+        }
+    }
+    /**
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();  // Eloquent model method
+    }
+
+    /**
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [
+             'user' => [
+                'id' => $this->id,
+                'email' => $this->email,
+                'password' => $this->password,
+                'voluntary' => $this->voluntary,
+             ]
+        ];
     }
 }
