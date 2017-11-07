@@ -50,6 +50,26 @@ class User extends Model implements
         return $this->hasMany('App\Message', 'sender_id', 'id');
     }
 
+    public function posts(){
+        return $this->hasMany('App\Post');
+    }
+    
+    public function likedPosts(){
+        return $this->belongsToMany('App\Post', 'liked_posts', 'liked_by', 'post_id');
+    }
+
+    public function favoritedPosts(){
+        return $this->belongsToMany('App\Post', 'favorited_posts', 'favorited_by', 'post_id');
+    }
+
+    public function myRatings(){
+        if($this->voluntary){
+            return $this->belongsToMany('App\User', 'users_ratings', 'user_id', 'rated_by');
+        }else{
+            return $this->belongsToMany('App\User', 'users_ratings', 'rated_by', 'user_id');
+        }
+    }
+
     public function chats(){
         if($this->voluntary){
             return $this->belongsToMany('App\Chat', 'user_chats', 'voluntary_id', 'chat_id');
@@ -57,6 +77,8 @@ class User extends Model implements
             return $this->belongsToMany('App\Chat', 'user_chats', 'user_id', 'chat_id');
         }
     }
+
+
     /**
      * @return mixed
      */

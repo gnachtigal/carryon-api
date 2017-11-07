@@ -22,7 +22,7 @@ Route::group(['prefix' => 'chat'], function(){
 	Route::get('/show/{id}', 'API\ChatController@show');
 });
 Route::group(['prefix' => 'user'], function(){
-	Route::get('/getAuthenticatedUser/{id}', 'API\UserController@getAuthenticatedUser');
+	Route::get('/getUser/{id}', 'API\UserController@getUser');
 });
 
 Route::post('login', 'Auth\LoginController@login');

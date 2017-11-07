@@ -35,11 +35,18 @@ class UserController extends Controller
        return response()->json(compact('token'));
    }
 
-    public function getAuthenticatedUser($id)
+    public function getUser($id)
     {
-        $user = User::find($id);
+        try {
+            $user = User::find($id);
+            $success = true;
+        } catch (Exception $e) {
+            $success = false;
+        }
 
-    	return response()->json(compact('user'));
+
+
+    	return response()->json(compact('user', 'success'));
     }
 
 }

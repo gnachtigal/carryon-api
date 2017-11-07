@@ -11,6 +11,7 @@ use App\UserChat;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 use App\Events\MessageSent;
+use Cache;
 
 class ChatController extends Controller
 {
@@ -54,5 +55,53 @@ class ChatController extends Controller
         broadcast(new MessageSent($sender, $receiver, $body))->toOthers();
 
         return ['status' => 'Message Sent!'];
+    }
+
+    public function setVoluntary($id){
+        try {
+            $voluntaries = [];
+            $voluntary = User::find($id);
+            array_push($voluntaries, $voluntary);
+
+            // Cache::forever('voluntaries_active', );
+
+        } catch (Exception $e) {
+            return response()->json(compact('e'));
+        }
+
+
+    }
+
+    public function searchVoluntary($id){
+        $voluntaries = Cache::get($id);
+
+        $voluntary = $voluntaries->first();
+
+        return response()->json($this->startConversation($voluntary, $id));
+    }
+
+    private function startConversation($voluntary_id, $user_id){
+        try {
+            $voluntary = User::find($voluntary_id);
+            $user = User::find($user_id);
+
+            $chat = Chat::create([
+                'title' => $voluntary->name . ' ajuda ' . $user->name
+            ]);
+
+            $user_chat = UserChats::create([
+                'user_id' => $user->id,
+                'voluntary_id' => $voluntary_id,
+                'chat_id' => $chat->id
+            ]);
+
+            Cache::pull('voluntaries_active', $voluntary->id);
+        } catch (Exception $e) {
+            return response()->json(compact('e'));
+        }
+
+
+
+        return compact('chat', 'user_chat');
     }
 }
