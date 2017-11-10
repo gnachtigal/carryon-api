@@ -15,6 +15,7 @@ class CreateUserChatsTable extends Migration
     {
         if (!Schema::hasTable('user_chats')) {
             Schema::create('user_chats', function (Blueprint $table) {
+                $table->increments('id');
                 $table->engine = 'InnoDB';
                 $table->integer('user_id');
                 $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
@@ -22,7 +23,7 @@ class CreateUserChatsTable extends Migration
                 $table->foreign('voluntary_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');;
                 $table->integer('chat_id');
                 $table->foreign('chat_id')->references('id')->on('chats')->onDelete('cascade')->onUpdate('cascade');
-                $table->primary(['user_id', 'chat_id']);
+                $table->timestamps();
             });
         }
     }

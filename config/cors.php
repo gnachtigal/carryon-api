@@ -14,8 +14,8 @@ return [
 
     'supportsCredentials' => false,
     'allowedOrigins' => ['*'],
-    'allowedHeaders' => ['X-Accept-Charset,X-Accept,Content-Type,Credentials'],
-    'allowedMethods' => ['POST, GET, PUT, OPTIONS, PATCH, DELETE'],
-    'exposedHeaders' => [],
+    'allowedHeaders' => ['Content-Type', 'X-Requested-With'],
+    'allowedMethods' => ['*'], // ex: ['GET', 'POST', 'PUT',  'DELETE']
+    'exposedHeaders' => [''],
     'maxAge' => 0,
 ];

@@ -20,6 +20,8 @@ use Illuminate\Http\Request;
 Route::group(['prefix' => 'chat'], function(){
 	Route::get('/{id}', 'API\ChatController@index');
 	Route::get('/show/{id}', 'API\ChatController@show');
+	Route::post('/setVoluntary', 'API\ChatController@setVoluntary');
+	Route::get('/searchVoluntary/{id}', 'API\ChatController@searchVoluntary');
 });
 Route::group(['prefix' => 'user'], function(){
 	Route::get('/getUser/{id}', 'API\UserController@getUser');

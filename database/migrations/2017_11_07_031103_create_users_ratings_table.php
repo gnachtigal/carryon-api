@@ -19,7 +19,7 @@ class CreateUsersRatingsTable extends Migration
             $table->integer('rated_by');
             $table->foreign('rated_by')->references('id')->on('users');
             $table->integer('user_id');
-            $table->foreign('user_id')->references('id')->on('posts');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
         });
     }

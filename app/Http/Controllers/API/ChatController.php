@@ -31,10 +31,14 @@ class ChatController extends Controller
 
     public function show($id){
         $chat = Chat::find($id);
+        $userChat = UserChat::where('chat_id', $chat->id)->get()[0];
+
+        $user = User::find($userChat->user_id);
+        $voluntary = User::find($userChat->voluntary_id);
 
         $messages = $chat->messages;
 
-        return response()->json(compact('messages'));
+        return response()->json(compact('messages', 'user', 'voluntary'));
     }
 
     public function delete(){
@@ -57,13 +61,27 @@ class ChatController extends Controller
         return ['status' => 'Message Sent!'];
     }
 
-    public function setVoluntary($id){
+    public function setVoluntary(Request $request){
+        $default = array();
         try {
-            $voluntaries = [];
-            $voluntary = User::find($id);
-            array_push($voluntaries, $voluntary);
+            $voluntaries = Cache::get('voluntaries_active', $default);
+            $voluntary = User::find($request['id']);
 
-            // Cache::forever('voluntaries_active', );
+            if(!in_array($voluntary, $voluntaries)){
+                array_push($voluntaries, $voluntary);
+                Cache::forever('voluntaries_active', $voluntaries);
+
+                $voluntaries = Cache::get('voluntaries_active', $default);
+                $msg = "Você foi colocado como disponível! :)";
+                $success = true;
+                return response()->json(compact('success', 'voluntaries', 'msg'));
+            }else{
+                $voluntaries = Cache::get('voluntaries_active', $default);
+                $msg = "Você já está disponível!";
+                $success = true;
+                return response()->json(compact('success', 'voluntaries','msg'));
+            }
+
 
         } catch (Exception $e) {
             return response()->json(compact('e'));
@@ -73,11 +91,25 @@ class ChatController extends Controller
     }
 
     public function searchVoluntary($id){
-        $voluntaries = Cache::get($id);
+        try {
+            $voluntaries = Cache::get('voluntaries_active');
+            $voluntary = array_shift($voluntaries);
 
-        $voluntary = $voluntaries->first();
+            if (isset($voluntary)) {
+                Cache::forever('voluntaries_active', $voluntaries);
 
-        return response()->json($this->startConversation($voluntary, $id));
+                $result = $this->startConversation($voluntary->id, $id);
+                return response()->json($result);
+            }
+            else{
+                $success = false;
+                return response()->json(compact('e', 'success'));
+            }
+        } catch (Exception $e) {
+            $success = false;
+            return response()->json(compact('e', 'success'));
+        }
+
     }
 
     private function startConversation($voluntary_id, $user_id){
@@ -89,19 +121,21 @@ class ChatController extends Controller
                 'title' => $voluntary->name . ' ajuda ' . $user->name
             ]);
 
-            $user_chat = UserChats::create([
+            $user_chat = UserChat::create([
                 'user_id' => $user->id,
                 'voluntary_id' => $voluntary_id,
                 'chat_id' => $chat->id
             ]);
 
-            Cache::pull('voluntaries_active', $voluntary->id);
+            $success = true;
+
         } catch (Exception $e) {
-            return response()->json(compact('e'));
+            $success = false;
+            return response()->json(compact('e', 'success'));
         }
 
 
 
-        return compact('chat', 'user_chat');
+        return compact('chat', 'user_chat', 'voluntary', 'success');
     }
 }
