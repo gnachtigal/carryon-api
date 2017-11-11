@@ -53,7 +53,7 @@ class User extends Model implements
     public function posts(){
         return $this->hasMany('App\Post');
     }
-    
+
     public function likedPosts(){
         return $this->belongsToMany('App\Post', 'liked_posts', 'liked_by', 'post_id');
     }
@@ -77,7 +77,6 @@ class User extends Model implements
             return $this->belongsToMany('App\Chat', 'user_chats', 'user_id', 'chat_id');
         }
     }
-
 
     /**
      * @return mixed

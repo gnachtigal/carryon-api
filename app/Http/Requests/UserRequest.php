@@ -38,6 +38,6 @@ class UserRequest extends FormRequest
            'email.email'  => 'Insira um e-mail válido.',
            'password.required'  => 'O campo senha é obrigatório.',
            'password_confirmation.same'  => 'As senhas devem coincidir.',
-   ];
+       ];
     }
 }

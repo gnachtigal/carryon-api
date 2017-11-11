@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
 use App\Http\Requests\UserRequest;
 use JWTAuth;
+use Session;
 
 class RegisterController extends Controller
 {

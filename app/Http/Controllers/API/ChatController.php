@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use Validator;
 use App\Events\MessageSent;
 use Cache;
+use App\Message;
+use LRedis;
 
 class ChatController extends Controller
 {
@@ -47,16 +49,23 @@ class ChatController extends Controller
 
     public function sendMessage(Request $request)
     {
-        $sender = Auth::user();
-        $receiver = $request->input('receiver_id');
+        $sender_id = $request->input('sender_id');
+        $chat_id = $request->input('chat_id');
+        $receiver_id = $request->input('receiver_id');
         $body = $request->input('body');
+        $user = User::find($sender_id);
 
-        $message = $user->sentMessages()->create([
+        $message = Message::create([
             'body' => $body,
-            'receiver_id' => $receiver
+            'receiver_id' => $receiver_id,
+            'sender_id' => $sender_id,
+            'chat_id' => $chat_id,
         ]);
 
-        broadcast(new MessageSent($sender, $receiver, $body))->toOthers();
+        $sender = User::find($sender_id);
+        $receiver = User::find($receiver_id);
+
+        broadcast(new MessageSent($sender, $receiver, $message))->toOthers();
 
         return ['status' => 'Message Sent!'];
     }
