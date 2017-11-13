@@ -14,19 +14,32 @@ use App\Events\MessageSent;
 use Cache;
 use App\Message;
 use LRedis;
+use Pusher;
 
 class ChatController extends Controller
 {
     public function index($id){
         $user = User::find($id);
+        $isVoluntary = $user->voluntary;
 
-        if($user->voluntary){
+        if($isVoluntary){
             $userChats = UserChat::where('voluntary_id', $id)->get();
         }else{
             $userChats = UserChat::where('user_id', $id)->get();
         }
 
-        $chats = Chat::whereIn('id', $userChats->pluck('chat_id'))->get();
+        $chats = Chat::whereIn('id', $userChats->pluck('chat_id'))->with('messages')->get();
+
+        foreach ($chats as $chat) {
+          if ($isVoluntary) {
+            $uc = UserChat::where(['voluntary_id' => $user->id, 'chat_id' => $chat->id])->get()[0];
+            $chat->contact = User::find($uc->user_id);
+          }else {
+            $uc = UserChat::where(['user_id' => $user->id, 'chat_id' => $chat->id])->get()[0];
+            $chat->contact = User::find($uc->voluntary_id);
+          }
+
+        }
 
         return response()->json(compact('chats'));
     }
@@ -61,11 +74,27 @@ class ChatController extends Controller
             'sender_id' => $sender_id,
             'chat_id' => $chat_id,
         ]);
-
         $sender = User::find($sender_id);
         $receiver = User::find($receiver_id);
 
-        broadcast(new MessageSent($sender, $receiver, $message))->toOthers();
+        $options = array(
+           'encrypted' => true
+         );
+
+         $pusher = new Pusher\Pusher(
+           'f9ccff647813635fc3dc',
+           'ad4cd74b4265d86a8267',
+           '407923',
+           $options
+         );
+
+        $data['message'] = $message;
+        $data['sender'] = $sender;
+        $data['receiver'] = $receiver;
+
+        $pusher->trigger('chat.' . $chat_id, 'newMessage', $data);
+
+        // broadcast(new MessageSent($sender, $receiver, $message))->toOthers();
 
         return ['status' => 'Message Sent!'];
     }
